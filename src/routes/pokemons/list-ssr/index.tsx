@@ -1,30 +1,58 @@
-import { component$ } from '@builder.io/qwik';
-import { DocumentHead, Link, routeLoader$ } from '@builder.io/qwik-city';
+import { $, component$, useComputed$, useSignal } from '@builder.io/qwik';
+import {
+  DocumentHead,
+  Link,
+  routeLoader$,
+  useLocation,
+  useNavigate,
+} from '@builder.io/qwik-city';
 import type { BasicPokemonInfo, PokemonListResponse } from '~/interfaces';
 
-export const usePokemonList = routeLoader$<BasicPokemonInfo[]>(async () => {
-  const resp = await fetch(
-    'https://pokeapi.co/api/v2/pokemon?limit=10&offset=10'
-  );
-  const data = (await resp.json()) as PokemonListResponse;
-  return data.results;
-});
+export const usePokemonList = routeLoader$<BasicPokemonInfo[]>(
+  async ({ pathname, query, redirect }) => {
+    const offset = Number(query.get('offset') || 0);
+    if (offset < 0) throw redirect(301, pathname);
+    if (isNaN(offset)) throw redirect(301, pathname);
+
+    const resp = await fetch(
+      `https://pokeapi.co/api/v2/pokemon?limit=10&offset=${offset}`
+    );
+    const data = (await resp.json()) as PokemonListResponse;
+    return data.results;
+  }
+);
 
 export default component$(() => {
   const pokemons = usePokemonList();
+  const location = useLocation();
+  const nav = useNavigate();
+
+  const currentOffset = useComputed$(() => {
+    const offsetString = location.url.searchParams.get('offset');
+    return Number(offsetString || 0);
+  });
+
+  const onClickNav = $((value: number) => {
+    if (currentOffset.value + value < 0) return;
+    nav(`/pokemons/list-ssr/?offset=${currentOffset.value + value}`);
+  });
 
   return (
     <>
       <div class="flex flex-col">
         <span class="my-5 text-5xl">Status</span>
-        <span>Pagina actual: XXXX</span>
-        <span>URL: XXXX</span>
+        <span>Offset: {currentOffset.value}</span>
+        <span>Loading: {location.isNavigating ? 'Yes' : 'No'}</span>
       </div>
 
       <div class="mt-10">
-        <Link class="btn btn-primary mr-2">Anteriores</Link>
+        <button class="btn btn-primary mr-2" onClick$={() => onClickNav(-10)}>
+          Anteriores
+        </button>
 
-        <Link class="btn btn-primary mr-2">Siguientes</Link>
+        <button class="btn btn-primary mr-2" onClick$={() => onClickNav(10)}>
+          Siguientes
+        </button>
       </div>
 
       <div class="grid grid-cols-6 mt-5">
