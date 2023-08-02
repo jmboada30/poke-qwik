@@ -52,14 +52,11 @@ export default component$(() => {
         </button>
       </div>
 
-      <div class="grid grid-cols-6 mt-5">
-        {pokemons.value.map((pokemon) => (
-          <div
-            key={pokemon.name}
-            class="m-5 flex flex-col justify-center items-center"
-          >
-            <PokemonImage id={pokemon.id} />
-            <span class="capitalize">{pokemon.name}</span>
+      <div class="mt-5 grid xs:grid-cols-2 sm:grid-cols-4 md:grid-cols-6 xl:grid-cols-8">
+        {pokemons.value.map(({ name, id }) => (
+          <div key={name} class="m-5 flex flex-col justify-center items-center">
+            <PokemonImage id={id} />
+            <span class="capitalize">{`${id}. ${name}`}</span>
           </div>
         ))}
       </div>

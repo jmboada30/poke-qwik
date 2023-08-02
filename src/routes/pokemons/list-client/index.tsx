@@ -1,4 +1,10 @@
-import { component$, useStore, useTask$ } from "@builder.io/qwik";
+import {
+  $,
+  component$,
+  useOnDocument,
+  useStore,
+  useTask$,
+} from "@builder.io/qwik";
 import { DocumentHead } from "@builder.io/qwik-city";
 import { PokemonImage } from "~/components/pokemons/pokemon-imagen";
 import { getSmallPokemons } from "~/helpers/get-small-pokemons";
@@ -14,43 +20,32 @@ export default component$(() => {
     pokemons: [],
   });
 
-  // el useVisibleTask$ se ejecuta del lado del cliente, por lo que
-  // podemos hacer uso de la API de fetch para obtener los datos
-  // useVisibleTask$(async ({ track }) => {
-  //   track(() => pokemonState.currentPage);
-
-  //   const pokemons = await getSmallPokemons(pokemonState.currentPage * 10);
-  //   pokemonState.pokemons = [...pokemonState.pokemons, ...pokemons];
-  // });
-
-  // el useTask$ se ejecuta del lado del servidor PERO tambien del lado del cliente
-  // y conecta el estado entre el servidor y el cliente. Primero se ejecuta del lado del servidor
-  // y luego del lado del cliente
   useTask$(async ({ track }) => {
     track(() => pokemonState.currentPage);
 
-    const pokemons = await getSmallPokemons(pokemonState.currentPage * 10);
+    const pokemons = await getSmallPokemons(pokemonState.currentPage * 10, 30);
     pokemonState.pokemons = [...pokemonState.pokemons, ...pokemons];
   });
+
+  useOnDocument(
+    "scroll",
+    $(() => {
+      const maxScroll = document.body.scrollHeight - window.innerHeight;
+      const currentScroll = window.scrollY;
+
+      if (currentScroll + 150 >= maxScroll) pokemonState.currentPage++;
+    })
+  );
 
   return (
     <>
       <div class="flex flex-col">
         <span class="my-5 text-5xl">Status</span>
         <span>Pagina Actual: {pokemonState.currentPage}</span>
-        <span>Loading: {false ? "Yes" : "No"}</span>
+        <span>Cargando: {false ? "Si" : "No"}</span>
       </div>
 
-      <div class="mt-10">
-        <button
-          class="btn btn-primary mr-2"
-          onClick$={() => pokemonState.currentPage++}
-        >
-          Siguientes
-        </button>
-      </div>
-
-      <div class="grid grid-cols-6 mt-5">
+      <div class="mt-5 grid xs:grid-cols-2 sm:grid-cols-4 md:grid-cols-6 xl:grid-cols-8">
         {pokemonState.pokemons.map(({ name, id }) => (
           <div key={name} class="m-5 flex flex-col justify-center items-center">
             <PokemonImage id={id} />
