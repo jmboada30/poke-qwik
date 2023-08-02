@@ -12,11 +12,15 @@ import { PokemonSmall } from "~/interfaces";
 
 export interface PokemonState {
   currentPage: number;
+  isLoading: boolean;
+  isFinished: boolean;
   pokemons: PokemonSmall[];
 }
 export default component$(() => {
   const pokemonState = useStore<PokemonState>({
     currentPage: 0,
+    isLoading: false,
+    isFinished: false,
     pokemons: [],
   });
 
@@ -25,6 +29,8 @@ export default component$(() => {
 
     const pokemons = await getSmallPokemons(pokemonState.currentPage * 10, 30);
     pokemonState.pokemons = [...pokemonState.pokemons, ...pokemons];
+    pokemonState.isFinished = pokemons.length === 0;
+    pokemonState.isLoading = false;
   });
 
   useOnDocument(
@@ -33,7 +39,10 @@ export default component$(() => {
       const maxScroll = document.body.scrollHeight - window.innerHeight;
       const currentScroll = window.scrollY;
 
-      if (currentScroll + 150 >= maxScroll) pokemonState.currentPage++;
+      if (currentScroll + 200 >= maxScroll && !pokemonState.isLoading && !pokemonState.isFinished) {
+        pokemonState.isLoading = true;
+        pokemonState.currentPage++;
+      }
     })
   );
 
@@ -46,8 +55,8 @@ export default component$(() => {
       </div>
 
       <div class="mt-5 grid xs:grid-cols-2 sm:grid-cols-4 md:grid-cols-6 xl:grid-cols-8">
-        {pokemonState.pokemons.map(({ name, id }) => (
-          <div key={name} class="m-5 flex flex-col justify-center items-center">
+        {pokemonState.pokemons.map(({ name, id }, idx) => (
+          <div key={idx} class="m-5 flex flex-col justify-center items-center">
             <PokemonImage id={id} />
             <span class="capitalize">{`${id}. ${name}`}</span>
           </div>
