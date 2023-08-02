@@ -1,26 +1,23 @@
-import { $, component$, useComputed$, useSignal } from '@builder.io/qwik';
+import { $, component$, useComputed$, useSignal } from "@builder.io/qwik";
 import {
   DocumentHead,
-  Link,
   routeLoader$,
   useLocation,
   useNavigate,
-} from '@builder.io/qwik-city';
-import type { BasicPokemonInfo, PokemonListResponse } from '~/interfaces';
+} from "@builder.io/qwik-city";
+import { PokemonImage } from "~/components/pokemons/pokemon-imagen";
+import { getSmallPokemons } from "~/helpers/get-small-pokemons";
+import type { PokemonSmall } from "~/interfaces";
 
-export const usePokemonList = routeLoader$<BasicPokemonInfo[]>(
-  async ({ pathname, query, redirect }) => {
-    const offset = Number(query.get('offset') || 0);
-    if (offset < 0) throw redirect(301, pathname);
-    if (isNaN(offset)) throw redirect(301, pathname);
+export const usePokemonList = routeLoader$<PokemonSmall[]>(async (route) => {
+  const { pathname, query, redirect } = route;
 
-    const resp = await fetch(
-      `https://pokeapi.co/api/v2/pokemon?limit=10&offset=${offset}`
-    );
-    const data = (await resp.json()) as PokemonListResponse;
-    return data.results;
-  }
-);
+  const offset = Number(query.get("offset") || 0);
+  if (offset < 0) throw redirect(301, pathname);
+  if (isNaN(offset)) throw redirect(301, pathname);
+
+  return await getSmallPokemons(offset);
+});
 
 export default component$(() => {
   const pokemons = usePokemonList();
@@ -28,7 +25,7 @@ export default component$(() => {
   const nav = useNavigate();
 
   const currentOffset = useComputed$(() => {
-    const offsetString = location.url.searchParams.get('offset');
+    const offsetString = location.url.searchParams.get("offset");
     return Number(offsetString || 0);
   });
 
@@ -42,7 +39,7 @@ export default component$(() => {
       <div class="flex flex-col">
         <span class="my-5 text-5xl">Status</span>
         <span>Offset: {currentOffset.value}</span>
-        <span>Loading: {location.isNavigating ? 'Yes' : 'No'}</span>
+        <span>Loading: {location.isNavigating ? "Yes" : "No"}</span>
       </div>
 
       <div class="mt-10">
@@ -61,21 +58,21 @@ export default component$(() => {
             key={pokemon.name}
             class="m-5 flex flex-col justify-center items-center"
           >
+            <PokemonImage id={pokemon.id} />
             <span class="capitalize">{pokemon.name}</span>
           </div>
         ))}
-        <div class="m-5 flex flex-col justify-center items-center">Pokemon</div>
       </div>
     </>
   );
 });
 
 export const head: DocumentHead = {
-  title: 'Client SSR',
+  title: "Client SSR",
   meta: [
     {
-      name: 'description',
-      content: 'Esta pagina es renderizada en el servidor',
+      name: "description",
+      content: "Esta pagina es renderizada en el servidor",
     },
   ],
 };
