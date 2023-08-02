@@ -1,4 +1,4 @@
-import { component$, useStore, useTask$, useVisibleTask$ } from "@builder.io/qwik";
+import { component$, useStore, useTask$ } from "@builder.io/qwik";
 import { DocumentHead } from "@builder.io/qwik-city";
 import { PokemonImage } from "~/components/pokemons/pokemon-imagen";
 import { getSmallPokemons } from "~/helpers/get-small-pokemons";
@@ -16,7 +16,17 @@ export default component$(() => {
 
   // el useVisibleTask$ se ejecuta del lado del cliente, por lo que
   // podemos hacer uso de la API de fetch para obtener los datos
-  useVisibleTask$(async ({ track }) => {
+  // useVisibleTask$(async ({ track }) => {
+  //   track(() => pokemonState.currentPage);
+
+  //   const pokemons = await getSmallPokemons(pokemonState.currentPage * 10);
+  //   pokemonState.pokemons = [...pokemonState.pokemons, ...pokemons];
+  // });
+
+  // el useTask$ se ejecuta del lado del servidor PERO tambien del lado del cliente
+  // y conecta el estado entre el servidor y el cliente. Primero se ejecuta del lado del servidor
+  // y luego del lado del cliente
+  useTask$(async ({ track }) => {
     track(() => pokemonState.currentPage);
 
     const pokemons = await getSmallPokemons(pokemonState.currentPage * 10);
