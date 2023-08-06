@@ -3,7 +3,7 @@ import {
   useComputed$,
   useSignal,
   useTask$,
-} from "@builder.io/qwik";
+} from '@builder.io/qwik';
 
 interface Props {
   id: number;
@@ -13,7 +13,7 @@ interface Props {
 }
 
 export const PokemonImage = component$((props: Props) => {
-  const { id, size = 200, backImage = false, isVisible = true } = props;
+  const { id, size = 160, backImage = false, isVisible = true } = props;
   const imageLoaded = useSignal(false);
   const imageUrl = useComputed$(() => {
     return backImage
@@ -35,14 +35,15 @@ export const PokemonImage = component$((props: Props) => {
       <img
         src={imageUrl.value}
         alt="Imagen Pokemon"
-        style={{ width: `${size}px`, height: `${size}px` }}
+        width={size}
+        height={size}
         onLoad$={() => (imageLoaded.value = true)}
         class={[
           {
             hidden: !imageLoaded.value,
-            "brightness-0": !isVisible,
+            'brightness-0': !isVisible,
           },
-          "transition-all duration-500 ease-in-out",
+          'transition-all duration-500 ease-in-out',
         ]}
       />
     </div>
