@@ -1,34 +1,33 @@
-import { $, component$, useSignal } from '@builder.io/qwik';
+import { $, component$, useContext, useSignal } from '@builder.io/qwik';
 import { useNavigate, type DocumentHead } from '@builder.io/qwik-city';
 import { PokemonImage } from '~/components/pokemons/pokemon-imagen';
+import { PokemonGameContext } from '~/context';
 
 export default component$(() => {
-  const pokemonId = useSignal(1);
-  const showBackImage = useSignal(false);
-  const isVisible = useSignal(true);
+  const pokemonGame = useContext(PokemonGameContext);
   const nav = useNavigate();
 
   const onPokemonIdChange = $((value: number) => {
-    const newValue = pokemonId.value + value;
+    const newValue = pokemonGame.pokemonId + value;
     if (newValue <= 0) return;
-    pokemonId.value = newValue;
+    pokemonGame.pokemonId = newValue;
   });
 
   const goToPokemon = $(async () => {
-    await nav(`/pokemon/${pokemonId.value}`);
+    await nav(`/pokemon/${pokemonGame.pokemonId}`);
   });
 
   return (
     <>
       <span class="text-2xl">Busqueda Simple</span>
 
-      <span class="text-9xl"> {pokemonId}</span>
+      <span class="text-9xl"> {pokemonGame.pokemonId}</span>
 
       <div onClick$={() => goToPokemon()}>
         <PokemonImage
-          id={pokemonId.value}
-          backImage={showBackImage.value}
-          isVisible={isVisible.value}
+          id={pokemonGame.pokemonId}
+          backImage={pokemonGame.showBackImage}
+          isVisible={pokemonGame.isPokemonVisible}
         />
       </div>
       <div class="mt-2">
@@ -48,16 +47,20 @@ export default component$(() => {
 
         <button
           class="btn btn-primary mr-2"
-          onClick$={() => (showBackImage.value = !showBackImage.value)}
+          onClick$={() =>
+            (pokemonGame.showBackImage = !pokemonGame.showBackImage)
+          }
         >
           Voltear
         </button>
 
         <button
           class="btn btn-primary"
-          onClick$={() => (isVisible.value = !isVisible.value)}
+          onClick$={() =>
+            (pokemonGame.isPokemonVisible = !pokemonGame.isPokemonVisible)
+          }
         >
-          {isVisible.value ? 'Ocultar' : 'Mostrar'}
+          {pokemonGame.isPokemonVisible ? 'Ocultar' : 'Mostrar'}
         </button>
       </div>
     </>
