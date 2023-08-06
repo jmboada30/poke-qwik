@@ -19,7 +19,7 @@ export const usePokemonList = routeLoader$<PokemonSmall[]>(async (route) => {
   return await getSmallPokemons(offset);
 });
 
-// Componente a renderizar en la pagina /pokemons/list-ssr
+// Page/Componente a renderizar en la pagina /pokemons/list-ssr
 export default component$(() => {
   const pokemons = usePokemonList();
   const location = useLocation();

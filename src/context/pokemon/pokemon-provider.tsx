@@ -31,6 +31,7 @@ export const PokemonProvider = component$(() => {
     pokemons: [],
   });
 
+  // El useContextProvider es el que se encarga de proveer el contexto a los componentes
   useContextProvider(PokemonGameContext, pokemonGame);
   useContextProvider(PokemonListContext, pokemonList);
 
@@ -39,9 +40,9 @@ export const PokemonProvider = component$(() => {
     if (localStorage.getItem('pokemon-game')) {
       const data = localStorage.getItem('pokemon-game')!;
       const pokemon = JSON.parse(data) as PokemonGameState;
-      pokemonGame.pokemonId = pokemon.pokemonId || 6;
-      pokemonGame.isPokemonVisible = pokemon.isPokemonVisible || true;
-      pokemonGame.showBackImage = pokemon.showBackImage || false;
+      pokemonGame.pokemonId = pokemon.pokemonId;
+      pokemonGame.isPokemonVisible = pokemon.isPokemonVisible;
+      pokemonGame.showBackImage = pokemon.showBackImage;
     }
   });
 

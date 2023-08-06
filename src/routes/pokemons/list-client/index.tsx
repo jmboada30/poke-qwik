@@ -18,7 +18,7 @@ export interface PokemonState {
   pokemons: PokemonSmall[];
 }
 
-// Componente a renderizar en la pagina /pokemons/list-client
+// Page/Componente a renderizar en la pagina /pokemons/list-client
 // se va a renderizar en el cliente
 export default component$(() => {
   const pokemonList = useContext(PokemonListContext);

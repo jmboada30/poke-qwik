@@ -3,7 +3,7 @@ import { useNavigate, type DocumentHead } from '@builder.io/qwik-city';
 import { PokemonImage } from '~/components/pokemons/pokemon-imagen';
 import { PokemonGameContext } from '~/context';
 
-// Componente a renderizar en la pagina /pokemons
+// Page/Componente a renderizar en la pagina /pokemons
 export default component$(() => {
   const pokemonGame = useContext(PokemonGameContext);
   const nav = useNavigate();
