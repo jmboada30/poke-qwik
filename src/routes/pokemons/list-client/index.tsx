@@ -1,14 +1,15 @@
 import {
   $,
   component$,
+  useContext,
   useOnDocument,
-  useStore,
   useTask$,
-} from "@builder.io/qwik";
-import { DocumentHead } from "@builder.io/qwik-city";
-import { PokemonImage } from "~/components/pokemons/pokemon-imagen";
-import { getSmallPokemons } from "~/helpers/get-small-pokemons";
-import { PokemonSmall } from "~/interfaces";
+} from '@builder.io/qwik';
+import { type DocumentHead } from '@builder.io/qwik-city';
+import { PokemonImage } from '~/components/pokemons/pokemon-imagen';
+import { PokemonListContext } from '~/context';
+import { getSmallPokemons } from '~/helpers/get-small-pokemons';
+import { type PokemonSmall } from '~/interfaces';
 
 export interface PokemonState {
   currentPage: number;
@@ -17,31 +18,30 @@ export interface PokemonState {
   pokemons: PokemonSmall[];
 }
 export default component$(() => {
-  const pokemonState = useStore<PokemonState>({
-    currentPage: 0,
-    isLoading: false,
-    isFinished: false,
-    pokemons: [],
-  });
+  const pokemonList = useContext(PokemonListContext);
 
   useTask$(async ({ track }) => {
-    track(() => pokemonState.currentPage);
+    track(() => pokemonList.currentPage);
 
-    const pokemons = await getSmallPokemons(pokemonState.currentPage * 10, 30);
-    pokemonState.pokemons = [...pokemonState.pokemons, ...pokemons];
-    pokemonState.isFinished = pokemons.length === 0;
-    pokemonState.isLoading = false;
+    const pokemons = await getSmallPokemons(pokemonList.currentPage * 10, 30);
+    pokemonList.pokemons = [...pokemonList.pokemons, ...pokemons];
+    pokemonList.isFinished = pokemons.length === 0;
+    pokemonList.isLoading = false;
   });
 
   useOnDocument(
-    "scroll",
+    'scroll',
     $(() => {
       const maxScroll = document.body.scrollHeight - window.innerHeight;
       const currentScroll = window.scrollY;
 
-      if (currentScroll + 200 >= maxScroll && !pokemonState.isLoading && !pokemonState.isFinished) {
-        pokemonState.isLoading = true;
-        pokemonState.currentPage++;
+      if (
+        currentScroll + 200 >= maxScroll &&
+        !pokemonList.isLoading &&
+        !pokemonList.isFinished
+      ) {
+        pokemonList.isLoading = true;
+        pokemonList.currentPage++;
       }
     })
   );
@@ -50,12 +50,12 @@ export default component$(() => {
     <>
       <div class="flex flex-col">
         <span class="my-5 text-5xl">Status</span>
-        <span>Pagina Actual: {pokemonState.currentPage}</span>
-        <span>Cargando: {false ? "Si" : "No"}</span>
+        <span>Pagina Actual: {pokemonList.currentPage}</span>
+        <span>Cargando: {pokemonList.isLoading ? 'Si' : 'No'}</span>
       </div>
 
       <div class="mt-5 grid xs:grid-cols-2 sm:grid-cols-4 md:grid-cols-6 xl:grid-cols-8">
-        {pokemonState.pokemons.map(({ name, id }, idx) => (
+        {pokemonList.pokemons.map(({ name, id }, idx) => (
           <div key={idx} class="m-5 flex flex-col justify-center items-center">
             <PokemonImage id={id} />
             <span class="capitalize">{`${id}. ${name}`}</span>
@@ -67,11 +67,11 @@ export default component$(() => {
 });
 
 export const head: DocumentHead = {
-  title: "Client List",
+  title: 'Client List',
   meta: [
     {
-      name: "description",
-      content: "Esta pagina es renderizada en el cliente",
+      name: 'description',
+      content: 'Esta pagina es renderizada en el cliente',
     },
   ],
 };

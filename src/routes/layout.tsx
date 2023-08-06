@@ -1,11 +1,17 @@
-import { component$, Slot, useContextProvider, useStore, useStyles$ } from '@builder.io/qwik';
-import { routeLoader$ } from '@builder.io/qwik-city';
+import {
+  component$,
+  Slot,
+  useContextProvider,
+  useStore,
+  useStyles$,
+} from '@builder.io/qwik';
 import type { RequestHandler } from '@builder.io/qwik-city';
 
 import NavBar from '~/components/shared/navbar/navbar';
 
 import styles from './styles.css?inline';
-import { PokemonGameContext, type PokemonGameState } from '~/context';
+import { PokemonGameContext, PokemonListContext } from '~/context';
+import { type PokemonGameState, type PokemonListState } from '~/context';
 
 export const onGet: RequestHandler = async ({ cacheControl }) => {
   // Control caching for this request for best performance and to reduce hosting costs:
@@ -27,7 +33,15 @@ export default component$(() => {
     pokemonId: 6,
   });
 
+  const pokemonList = useStore<PokemonListState>({
+    currentPage: 1,
+    isFinished: false,
+    isLoading: true,
+    pokemons: [],
+  });
+
   useContextProvider(PokemonGameContext, pokemonGame);
+  useContextProvider(PokemonListContext, pokemonList);
   return (
     <>
       <NavBar />
