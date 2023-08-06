@@ -1,31 +1,32 @@
-import { $, component$, useComputed$, useSignal } from "@builder.io/qwik";
+import { $, component$, useComputed$ } from '@builder.io/qwik';
 import {
-  DocumentHead,
+  type DocumentHead,
   routeLoader$,
   useLocation,
   useNavigate,
-} from "@builder.io/qwik-city";
-import { PokemonImage } from "~/components/pokemons/pokemon-imagen";
-import { getSmallPokemons } from "~/helpers/get-small-pokemons";
-import type { PokemonSmall } from "~/interfaces";
+} from '@builder.io/qwik-city';
+import { PokemonImage } from '~/components/pokemons/pokemon-imagen';
+import { getSmallPokemons } from '~/helpers/get-small-pokemons';
+import type { PokemonSmall } from '~/interfaces';
 
 export const usePokemonList = routeLoader$<PokemonSmall[]>(async (route) => {
   const { pathname, query, redirect } = route;
 
-  const offset = Number(query.get("offset") || 0);
+  const offset = Number(query.get('offset') || 0);
   if (offset < 0) throw redirect(301, pathname);
   if (isNaN(offset)) throw redirect(301, pathname);
 
   return await getSmallPokemons(offset);
 });
 
+// Componente a renderizar en la pagina /pokemons/list-ssr
 export default component$(() => {
   const pokemons = usePokemonList();
   const location = useLocation();
   const nav = useNavigate();
 
   const currentOffset = useComputed$(() => {
-    const offsetString = location.url.searchParams.get("offset");
+    const offsetString = location.url.searchParams.get('offset');
     return Number(offsetString || 0);
   });
 
@@ -39,7 +40,7 @@ export default component$(() => {
       <div class="flex flex-col">
         <span class="my-5 text-5xl">Status</span>
         <span>Offset: {currentOffset.value}</span>
-        <span>Loading: {location.isNavigating ? "Yes" : "No"}</span>
+        <span>Loading: {location.isNavigating ? 'Yes' : 'No'}</span>
       </div>
 
       <div class="mt-10">
@@ -64,12 +65,13 @@ export default component$(() => {
   );
 });
 
+// Este head nos permite definir el titulo y meta tags de la pagina
 export const head: DocumentHead = {
-  title: "Client SSR",
+  title: 'Client SSR',
   meta: [
     {
-      name: "description",
-      content: "Esta pagina es renderizada en el servidor",
+      name: 'description',
+      content: 'Esta pagina es renderizada en el servidor',
     },
   ],
 };

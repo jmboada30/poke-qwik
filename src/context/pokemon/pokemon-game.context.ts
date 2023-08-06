@@ -6,6 +6,8 @@ export interface PokemonGameState {
   isPokemonVisible: boolean;
 }
 
+// Aqui definimos el contexto del juego de pokemon
+// para poder usarlo en cualquier parte de la app
 export const PokemonGameContext = createContextId<PokemonGameState>(
   'pokemon-game.context'
 );

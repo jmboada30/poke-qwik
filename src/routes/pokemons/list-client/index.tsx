@@ -17,6 +17,9 @@ export interface PokemonState {
   isFinished: boolean;
   pokemons: PokemonSmall[];
 }
+
+// Componente a renderizar en la pagina /pokemons/list-client
+// se va a renderizar en el cliente
 export default component$(() => {
   const pokemonList = useContext(PokemonListContext);
 
@@ -29,6 +32,7 @@ export default component$(() => {
     pokemonList.isLoading = false;
   });
 
+  // Este useOnDocument se ejecuta en el browser cada vez que se hace scroll
   useOnDocument(
     'scroll',
     $(() => {
@@ -66,6 +70,8 @@ export default component$(() => {
   );
 });
 
+// Este head se va a renderizar en el cliente
+// y nos permite cambiar el titulo de la pagina y los meta tags
 export const head: DocumentHead = {
   title: 'Client List',
   meta: [
