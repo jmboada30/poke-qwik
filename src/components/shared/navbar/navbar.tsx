@@ -14,11 +14,21 @@ export default component$(() => {
         </div>
         <ul>
           <li>
+            <Link href="/login">Login</Link>
+          </li>
+
+          <li>
+            <Link href="/dashboard">Dashboard</Link>
+          </li>
+
+          <li>
             <Link href="/counter">CounterHook</Link>
           </li>
+
           <li>
             <Link href="/pokemons/list-ssr/">SSR</Link>
           </li>
+
           <li>
             <Link href="/pokemons/list-client/">Client</Link>
           </li>
