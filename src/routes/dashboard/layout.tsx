@@ -4,7 +4,6 @@ import Navbar from '~/components/shared/navbar/navbar';
 
 export const useCheckAuthCookie = routeLoader$(({cookie, redirect})=> {
   const jwtCookie = cookie.get('jwt');
-  console.log('jwtCookie', jwtCookie);
   if (!jwtCookie) throw redirect(302, '/login');
   if(jwtCookie.value !== 'esto_es_un_token') throw redirect(302, '/login');
   
